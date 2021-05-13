@@ -1,0 +1,20 @@
+
+# Gradle
+.gradle/
+build/
+gradle.properties
+
+# IDEA
+.idea
+*.iml
+out/
+
+# TeamCity Configs Maven plugin
+.teamcity/target/
+
+# gradle-teamcity-plugin
+data/
+downloads/
+servers/
+
+.DS_Store
