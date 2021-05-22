@@ -1,6 +1,8 @@
 
+import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.project
+import jetbrains.buildServer.configs.kotlin.v2019_2.toId
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.v2019_2.vcs.GitVcsRoot
 import jetbrains.buildServer.configs.kotlin.v2019_2.version
@@ -9,11 +11,12 @@ version = "2020.2"
 
 project {
 
-    val vcsId = "JmxSupport"
+    val vcsName = DslContext.getParameter("VCS_NAME")
+    val vcsUrl = DslContext.getParameter("VCS_URL")
     val vcsRoot = GitVcsRoot {
-        id(vcsId)
-        name = "jmx-support"
-        url = "https://github.com/rodm/teamcity-jmx-plugin"
+        id(vcsName.toId())
+        name = vcsName
+        url = vcsUrl
         useMirrors = false
     }
     vcsRoot(vcsRoot)
