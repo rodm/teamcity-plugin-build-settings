@@ -1,4 +1,5 @@
 
+import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.project
@@ -69,22 +70,23 @@ project {
         }
     }
 
-    val build1 = buildType {
-        templates(buildTemplate)
-        id("Build1")
-        name = "Build - TeamCity 2018.1"
+    val apiVersions = DslContext.getParameter("teamcity.api.versions")
+    val builds = mutableListOf<BuildType>()
+    apiVersions.split(",").forEachIndexed { index, version ->
+        val build = buildType {
+            templates(buildTemplate)
+            id("Build${index + 1}")
+            name = "Build - TeamCity ${version}"
 
-        artifactRules = "build/distributions/*.zip"
-    }
-
-    val build2 = buildType {
-        templates(buildTemplate)
-        id("Build2")
-        name = "Build - TeamCity 2020.2"
-
-        params {
-            param("gradle.opts", "-Dteamcity.version=2020.2")
+            if (index == 0) {
+                artifactRules = "build/distributions/*.zip"
+            } else {
+                params {
+                    param("gradle.opts", "-Pteamcity.api.version=${version}")
+                }
+            }
         }
+        builds.add(build)
     }
 
     val reportCodeQuality = buildType {
@@ -97,6 +99,7 @@ project {
             param("gradle.tasks", "clean build sonarqube")
         }
     }
+    builds.add(reportCodeQuality)
 
-    buildTypesOrder = arrayListOf(build1, build2, reportCodeQuality)
+    buildTypesOrder = builds.toList()
 }
