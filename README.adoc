@@ -1,0 +1,21 @@
+:uri-teamcity-settings: https://www.jetbrains.com/help/teamcity/kotlin-dsl.html
+:uri-teamcity-plugin: https://plugins.jetbrains.com/docs/teamcity/
+:uri-gradle: https://gradle.org/[Gradle]
+:uri-blog-post: https://blog.jetbrains.com/teamcity/2020/09/creating-teamcity-project-templates-with-kotlin-dsl-context-parameters/
+
+= TeamCity Plugin Build Settings
+
+This project contains TeamCity {uri-teamcity-settings}[Kotlin DSL settings] to build
+a {uri-teamcity-plugin}[TeamCity plugin] using {uri-gradle}.
+
+The settings require the following context parameters to be configured for a project
+
+* `vcs.name` - A name for the VCS root
+* `vcs.url` - A Git URL to the project containing the TeamCity plugin code
+* `teamcity.api.versions` - A comma separated list of TeamCity versions, e.g. `2018.1,2020.2`
+
+For each version listed in the `teamcity.api.versions` parameter a build configuration is
+created to build the plugin code using that version of the TeamCity API.
+
+This project based on the ideas from the following blog post
+{uri-blog-post}[Creating TeamCity project templates with Kotlin DSL context parameters]
