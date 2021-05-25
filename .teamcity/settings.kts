@@ -12,8 +12,8 @@ version = "2020.2"
 
 project {
 
-    val vcsName = DslContext.getParameter("VCS_NAME")
-    val vcsUrl = DslContext.getParameter("VCS_URL")
+    val vcsName = DslContext.getParameter("vcs.name")
+    val vcsUrl = DslContext.getParameter("vcs.url")
     val vcsRoot = GitVcsRoot {
         id(vcsName.toId())
         name = vcsName
