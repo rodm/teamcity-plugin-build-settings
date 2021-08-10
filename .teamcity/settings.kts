@@ -6,6 +6,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.project
 import jetbrains.buildServer.configs.kotlin.v2019_2.toId
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.v2019_2.vcs.GitVcsRoot
+import jetbrains.buildServer.configs.kotlin.v2019_2.vcs.GitVcsRoot.AgentCheckoutPolicy.NO_MIRRORS
 import jetbrains.buildServer.configs.kotlin.v2019_2.version
 
 version = "2021.1"
@@ -18,7 +19,7 @@ project {
         id(vcsName.toId())
         name = vcsName
         url = vcsUrl
-        useMirrors = false
+        checkoutPolicy = NO_MIRRORS
     }
     vcsRoot(vcsRoot)
 
