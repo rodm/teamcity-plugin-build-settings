@@ -1,6 +1,6 @@
 
 plugins {
-    id ("com.github.rodm.teamcity-environments") version "1.4.1"
+    id ("io.github.rodm.teamcity-environments") version "1.5"
 }
 
 teamcity {
