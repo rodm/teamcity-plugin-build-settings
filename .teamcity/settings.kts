@@ -15,10 +15,12 @@ project {
 
     val vcsName = DslContext.getParameter("vcs.name")
     val vcsUrl = DslContext.getParameter("vcs.url")
+    val vcsBranch = DslContext.getParameter("vcs.branch", "master")
     val vcsRoot = GitVcsRoot {
         id(vcsName.toId())
         name = vcsName
         url = vcsUrl
+        branch = "refs/heads/$vcsBranch"
         checkoutPolicy = NO_MIRRORS
     }
     vcsRoot(vcsRoot)
