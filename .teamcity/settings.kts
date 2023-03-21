@@ -1,6 +1,7 @@
 
 import jetbrains.buildServer.configs.kotlin.BuildType
 import jetbrains.buildServer.configs.kotlin.DslContext
+import jetbrains.buildServer.configs.kotlin.Requirements
 import jetbrains.buildServer.configs.kotlin.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.project
 import jetbrains.buildServer.configs.kotlin.toId
@@ -108,5 +109,33 @@ project {
     }
     builds.add(reportCodeQuality)
 
+    val requirements = DslContext.getParameter("agent.requirements").split(",")
+    requirements.forEach { requirement ->
+        builds.forEach { build ->
+            when (requirement.trim()) {
+                "linux" -> build.requirements { linux() }
+                "macos" -> build.requirements { macos() }
+                "windows" -> build.requirements { windows() }
+                "docker" -> build.requirements { docker() }
+            }
+        }
+    }
+
     buildTypesOrder = builds.toList()
+}
+
+fun Requirements.linux() {
+    contains("teamcity.agent.jvm.os.name", "Linux")
+}
+
+fun Requirements.macos() {
+    contains("teamcity.agent.jvm.os.name", "Mac OS X")
+}
+
+fun Requirements.windows() {
+    contains("teamcity.agent.jvm.os.name", "Windows")
+}
+
+fun Requirements.docker() {
+    exists("docker.server.version")
 }
