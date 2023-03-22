@@ -109,7 +109,7 @@ project {
     }
     builds.add(reportCodeQuality)
 
-    val requirements = DslContext.getParameter("agent.requirements").split(",")
+    val requirements = DslContext.getParameter("agent.requirements", "").split(",")
     requirements.forEach { requirement ->
         builds.forEach { build ->
             when (requirement.trim()) {
