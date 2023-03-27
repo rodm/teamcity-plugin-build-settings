@@ -1,6 +1,7 @@
 
 import jetbrains.buildServer.configs.kotlin.BuildType
 import jetbrains.buildServer.configs.kotlin.DslContext
+import jetbrains.buildServer.configs.kotlin.RelativeId
 import jetbrains.buildServer.configs.kotlin.Requirements
 import jetbrains.buildServer.configs.kotlin.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.project
@@ -109,14 +110,24 @@ project {
     }
     builds.add(reportCodeQuality)
 
+    val buildIds = builds.map { build -> build.id }
     val requirements = DslContext.getParameter("agent.requirements", "").split(",")
     requirements.forEach { requirement ->
-        builds.forEach { build ->
-            when (requirement.trim()) {
-                "linux" -> build.requirements { linux() }
-                "macos" -> build.requirements { macos() }
-                "windows" -> build.requirements { windows() }
-                "docker" -> build.requirements { docker() }
+        val parts = requirement.split("=")
+        val name = parts.last().trim()
+        val buildId = if (parts.size > 1) parts.first().trim() else ""
+
+        if (buildId.isNotEmpty().and(RelativeId(buildId) !in buildIds)) throw IllegalArgumentException("Invalid build id: $buildId")
+
+        builds
+            .filter { build -> buildId.isEmpty().or(RelativeId(buildId) == build.id) }
+            .forEach { build ->
+                when (name) {
+                    "linux" -> build.requirements { linux() }
+                    "macos" -> build.requirements { macos() }
+                    "windows" -> build.requirements { windows() }
+                    "docker" -> build.requirements { docker() }
+                    else -> throw IllegalArgumentException("Invalid requirement: $name")
             }
         }
     }
