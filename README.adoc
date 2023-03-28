@@ -8,7 +8,9 @@
 This project contains TeamCity {uri-teamcity-settings}[Kotlin DSL settings] to build
 a {uri-teamcity-plugin}[TeamCity plugin] using {uri-gradle}.
 
-The settings require the following context parameters to be configured for a project
+The settings for a project can be configured with the following context parameters
+
+Required context parameters
 
 * `vcs.name` - A name for the VCS root
 * `vcs.url` - A Git URL to the project containing the TeamCity plugin code
@@ -16,6 +18,24 @@ The settings require the following context parameters to be configured for a pro
 
 For each version listed in the `teamcity.api.versions` parameter a build configuration is
 created to build the plugin code using that version of the TeamCity API.
+
+Optional context parameters
+
+* `vcs.branch` - A name for the branch to use. The default is `master`.
+* `agent.requirements` - A comma separated list of either build id and requirement or requirement. If the build id is
+not specified then the requirement applies to all build configurations. The default is no agent requirement, e.g. `Build1=linux,docker`, this example creates all build configurations requiring Docker and `Build1` to require Docker and Linux.
+
+A list of requirement names
+
+* `linux` - A build configuration requires a build agent running on Linux
+* `macos` - A build configuration requires a build agent running on macOS
+* `windows` - A build configuration requires a build agent running on Windows
+* `docker` - A build configuration requires a build agent with Docker.
+
+The build configuration ids depend on the number of TeamCity API versions specified in the parameter `teamcity.api.versions`,
+the first configuration is `Build1`, the second is `Build2` etc. The reporting configuration has the id `ReportCodeQuality`.
+
+Invalid build ids and requirement names throw an exception causing the `teamcity-configs:generate` task to fail.
 
 This project based on the ideas from the following blog post
 {uri-blog-post}[Creating TeamCity project templates with Kotlin DSL context parameters]
