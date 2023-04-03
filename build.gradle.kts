@@ -6,7 +6,7 @@ plugins {
 teamcity {
     environments {
         register("teamcity2022.10") {
-            version = "2022.10.1"
+            version = "2022.10.3"
         }
     }
 }
