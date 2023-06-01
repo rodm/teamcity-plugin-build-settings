@@ -111,28 +111,32 @@ project {
     builds.add(reportCodeQuality)
 
     val buildIds = builds.map { build -> build.id }
-    val requirements = DslContext.getParameter("agent.requirements", "").split(",")
-    requirements.forEach { requirement ->
-        val parts = requirement.split("=")
-        val name = parts.last().trim()
-        val buildId = if (parts.size > 1) parts.first().trim() else ""
+    val requirements = DslContext.getParameter("agent.requirements", "")
+    if (requirements.isNotBlank()) {
+        requirements.split(",").forEach { requirement ->
+            val parts = requirement.split("=")
+            val name = parts.last().trim()
+            val buildId = if (parts.size > 1) parts.first().trim() else ""
 
-        if (buildId.isNotEmpty().and(RelativeId(buildId) !in buildIds)) throw IllegalArgumentException("Invalid build id: $buildId")
+            if (buildId.isNotEmpty().and(RelativeId(buildId) !in buildIds))
+                throw IllegalArgumentException("Invalid build id: $buildId")
 
-        builds
-            .filter { build -> buildId.isEmpty().or(RelativeId(buildId) == build.id) }
-            .forEach { build ->
-                when (name) {
-                    "linux" -> build.requirements { linux() }
-                    "macos" -> build.requirements { macos() }
-                    "windows" -> build.requirements { windows() }
-                    "docker" -> build.requirements { docker() }
-                    else -> throw IllegalArgumentException("Invalid requirement: $name")
-            }
+            builds.filter { build -> buildId.isEmpty().or(RelativeId(buildId) == build.id) }
+                .forEach { build -> applyRequirement(name, build) }
         }
     }
 
     buildTypesOrder = builds.toList()
+}
+
+fun applyRequirement(name: String, build: BuildType) {
+    when (name) {
+        "linux" -> build.requirements { linux() }
+        "macos" -> build.requirements { macos() }
+        "windows" -> build.requirements { windows() }
+        "docker" -> build.requirements { docker() }
+        else -> throw IllegalArgumentException("Invalid requirement: $name")
+    }
 }
 
 fun Requirements.linux() {
