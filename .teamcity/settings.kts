@@ -106,7 +106,7 @@ project {
 
         params {
             param("gradle.opts", "%sonar.opts%")
-            param("gradle.tasks", "clean build sonarqube")
+            param("gradle.tasks", "clean build sonar")
         }
     }
     builds.add(reportCodeQuality)
