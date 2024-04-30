@@ -148,6 +148,15 @@ fun GitVcsRoot.configureAuthentication() {
             }
         }
 
+        "password" -> {
+            val vcsAuthUserName = DslContext.getParameter("vcs.auth.username", "")
+            val vcsAuthPassword = DslContext.getParameter("vcs.auth.password", "")
+            authMethod = password {
+                if (vcsAuthUserName.isNotBlank()) userName = vcsAuthUserName
+                if (vcsAuthPassword.isNotBlank()) password = vcsAuthPassword
+            }
+        }
+
         else -> throw IllegalArgumentException("Invalid authentication method: $vcsAuthMethod")
     }
 }
