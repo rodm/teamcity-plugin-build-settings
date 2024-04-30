@@ -18,29 +18,13 @@ project {
     val vcsName = DslContext.getParameter("vcs.name")
     val vcsUrl = DslContext.getParameter("vcs.url")
     val vcsBranch = DslContext.getParameter("vcs.branch", "master")
-    val vcsAuthMethod = DslContext.getParameter("vcs.auth.method", "anonymous")
     val vcsRoot = GitVcsRoot {
         id(vcsName.toId())
         name = vcsName
         url = vcsUrl
         branch = "refs/heads/$vcsBranch"
         checkoutPolicy = NO_MIRRORS
-        when (vcsAuthMethod) {
-            "anonymous" -> {
-                authMethod = anonymous()
-            }
-            "uploadedkey" -> {
-                val vcsAuthUserName = DslContext.getParameter("vcs.auth.username", "")
-                val vcsAuthUploadedKey = DslContext.getParameter("vcs.auth.uploadedkey", "")
-                val vcsAuthPassphrase = DslContext.getParameter("vcs.auth.passphrase", "")
-                authMethod = uploadedKey {
-                    if (vcsAuthUserName.isNotBlank()) userName = vcsAuthUserName
-                    if (vcsAuthUploadedKey.isNotBlank()) uploadedKey = vcsAuthUploadedKey
-                    if (vcsAuthPassphrase.isNotBlank()) passphrase = vcsAuthPassphrase
-                }
-            }
-            else -> throw IllegalArgumentException("Invalid authentication method: $vcsAuthMethod")
-        }
+        configureAuthentication()
     }
     vcsRoot(vcsRoot)
 
@@ -144,6 +128,28 @@ project {
     }
 
     buildTypesOrder = builds.toList()
+}
+
+fun GitVcsRoot.configureAuthentication() {
+    val vcsAuthMethod = DslContext.getParameter("vcs.auth.method", "anonymous")
+    when (vcsAuthMethod) {
+        "anonymous" -> {
+            authMethod = anonymous()
+        }
+
+        "uploadedkey" -> {
+            val vcsAuthUserName = DslContext.getParameter("vcs.auth.username", "")
+            val vcsAuthUploadedKey = DslContext.getParameter("vcs.auth.uploadedkey", "")
+            val vcsAuthPassphrase = DslContext.getParameter("vcs.auth.passphrase", "")
+            authMethod = uploadedKey {
+                if (vcsAuthUserName.isNotBlank()) userName = vcsAuthUserName
+                if (vcsAuthUploadedKey.isNotBlank()) uploadedKey = vcsAuthUploadedKey
+                if (vcsAuthPassphrase.isNotBlank()) passphrase = vcsAuthPassphrase
+            }
+        }
+
+        else -> throw IllegalArgumentException("Invalid authentication method: $vcsAuthMethod")
+    }
 }
 
 fun applyRequirement(name: String, build: BuildType) {
