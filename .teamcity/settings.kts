@@ -89,7 +89,7 @@ project {
             name = "Build - TeamCity ${version}"
 
             if (index == 0) {
-                artifactRules = "build/distributions/*.zip"
+                artifactRules = DslContext.getParameter("artifact.paths", "build/distributions/*.zip")
             } else {
                 params {
                     param("gradle.opts", "-Pteamcity.api.version=${version}")
