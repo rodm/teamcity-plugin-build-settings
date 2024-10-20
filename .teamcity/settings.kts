@@ -81,6 +81,7 @@ project {
     }
 
     val apiVersions = DslContext.getParameter("teamcity.api.versions")
+    val gradleOptions = DslContext.getParameter("gradle.options", "")
     val builds = mutableListOf<BuildType>()
     apiVersions.split(",").forEachIndexed { index, version ->
         val build = buildType {
@@ -90,10 +91,9 @@ project {
 
             if (index == 0) {
                 artifactRules = DslContext.getParameter("artifact.paths", "build/distributions/*.zip")
-            } else {
-                params {
-                    param("gradle.opts", "-Pteamcity.api.version=${version}")
-                }
+            }
+            params {
+                param("gradle.opts", "-Pteamcity.api.version=${version} ${gradleOptions}")
             }
         }
         builds.add(build)
@@ -105,7 +105,7 @@ project {
         name = "Report - Code Quality"
 
         params {
-            param("gradle.opts", "%sonar.opts%")
+            param("gradle.opts", "%sonar.opts% ${gradleOptions}")
             param("gradle.tasks", "clean build sonar")
         }
     }
