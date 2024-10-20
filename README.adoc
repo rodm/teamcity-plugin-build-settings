@@ -22,6 +22,9 @@ created to build the plugin code using that version of the TeamCity API.
 Optional context parameters
 
 * `vcs.branch` - A name for the branch to use. The default is `master`.
+* `artifact.paths` - A comma separated or newline separated list of paths to search for artifacts to publish.
+https://www.jetbrains.com/help/teamcity/2024.07/?Configuring+General+Settings#ConfiguringGeneralSettings-ArtifactPaths
+* `gradle.options` - A string of additional options to be passed to the Gradle command. The default is an empty string.
 * `agent.requirements` - A comma separated list of either build id and requirement or requirement. If the build id is
 not specified then the requirement applies to all build configurations. The default is no agent requirement, e.g. `Build1=linux,docker`, this example creates all build configurations requiring Docker and `Build1` to require Docker and Linux.
 
