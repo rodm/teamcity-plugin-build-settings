@@ -81,6 +81,7 @@ project {
     }
 
     val apiVersions = DslContext.getParameter("teamcity.api.versions")
+    val gradleTasks = DslContext.getParameter("gradle.tasks", "")
     val gradleOptions = DslContext.getParameter("gradle.options", "")
     val builds = mutableListOf<BuildType>()
     apiVersions.split(",").forEachIndexed { index, version ->
@@ -94,6 +95,9 @@ project {
             }
             params {
                 param("gradle.opts", "-Pteamcity.api.version=${version} ${gradleOptions}")
+                if (gradleTasks.isNotEmpty()) {
+                    param("gradle.tasks", gradleTasks)
+                }
             }
         }
         builds.add(build)
