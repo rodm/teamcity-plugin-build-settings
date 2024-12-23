@@ -23,6 +23,11 @@ project {
         name = vcsName
         url = vcsUrl
         branch = "refs/heads/$vcsBranch"
+        branchSpec = """
+            +:refs/heads/($vcsBranch)
+            +:refs/tags/(*)
+        """.trimIndent()
+        useTagsAsBranches = true
         checkoutPolicy = NO_MIRRORS
         configureAuthentication()
     }
