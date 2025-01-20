@@ -34,6 +34,7 @@ A list of requirement names
 
 * `linux` - A build configuration requires a build agent running on Linux
 * `macos` - A build configuration requires a build agent running on macOS
+* `solaris` - A build configuration requires a build agent running on Solaris
 * `windows` - A build configuration requires a build agent running on Windows
 * `docker` - A build configuration requires a build agent with Docker.
 

@@ -174,6 +174,7 @@ fun applyRequirement(name: String, build: BuildType) {
     when (name) {
         "linux" -> build.requirements { linux() }
         "macos" -> build.requirements { macos() }
+        "solaris" -> build.requirements { solaris() }
         "windows" -> build.requirements { windows() }
         "docker" -> build.requirements { docker() }
         else -> throw IllegalArgumentException("Invalid requirement: $name")
@@ -186,6 +187,10 @@ fun Requirements.linux() {
 
 fun Requirements.macos() {
     contains("teamcity.agent.jvm.os.name", "Mac OS X")
+}
+
+fun Requirements.solaris() {
+    contains("teamcity.agent.jvm.os.name", "SunOS")
 }
 
 fun Requirements.windows() {
