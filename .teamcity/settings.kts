@@ -1,12 +1,11 @@
 
+import extensions.defaultPluginBuildTemplate
 import jetbrains.buildServer.configs.kotlin.BuildType
 import jetbrains.buildServer.configs.kotlin.DslContext
 import jetbrains.buildServer.configs.kotlin.RelativeId
 import jetbrains.buildServer.configs.kotlin.Requirements
-import jetbrains.buildServer.configs.kotlin.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.project
 import jetbrains.buildServer.configs.kotlin.toId
-import jetbrains.buildServer.configs.kotlin.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot
 import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot.AgentCheckoutPolicy.NO_MIRRORS
 import jetbrains.buildServer.configs.kotlin.version
@@ -37,53 +36,7 @@ project {
         param("teamcity.ui.settings.readOnly", "true")
     }
 
-    val buildTemplate = template {
-        id("Build")
-        name = "build plugin"
-
-        vcs {
-            root(vcsRoot)
-        }
-
-        steps {
-            gradle {
-                id = "RUNNER_19"
-                tasks = "%gradle.tasks%"
-                gradleParams = "%gradle.opts%"
-                useGradleWrapper = true
-                enableStacktrace = true
-                jdkHome = "%java.home%"
-            }
-        }
-
-        triggers {
-            vcs {
-                id = "vcsTrigger"
-                branchFilter = ""
-                triggerRules = """
-                    -:.github/**
-                    -:README.adoc
-                """.trimIndent()
-            }
-        }
-
-        failureConditions {
-            executionTimeoutMin = 15
-        }
-
-        features {
-            feature {
-                id = "perfmon"
-                type = "perfmon"
-            }
-        }
-
-        params {
-            param("gradle.opts", "")
-            param("gradle.tasks", "clean build")
-            param("java.home", "%java8.home%")
-        }
-    }
+    val buildTemplate = defaultPluginBuildTemplate(vcsRoot)
 
     val apiVersions = DslContext.getParameter("teamcity.api.versions")
     val gradleTasks = DslContext.getParameter("gradle.tasks", "")
