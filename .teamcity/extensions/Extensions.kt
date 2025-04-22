@@ -15,11 +15,66 @@
  */
 package extensions
 
+import jetbrains.buildServer.configs.kotlin.DslContext
 import jetbrains.buildServer.configs.kotlin.Project
 import jetbrains.buildServer.configs.kotlin.Template
 import jetbrains.buildServer.configs.kotlin.VcsRoot
 import jetbrains.buildServer.configs.kotlin.buildSteps.gradle
+import jetbrains.buildServer.configs.kotlin.toId
 import jetbrains.buildServer.configs.kotlin.triggers.vcs
+import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot
+
+fun Project.createVcsRoot(): GitVcsRoot {
+    val vcsName = DslContext.getParameter("vcs.name")
+    val vcsUrl = DslContext.getParameter("vcs.url")
+    val vcsBranch = DslContext.getParameter("vcs.branch", "master")
+    val vcsRoot = GitVcsRoot {
+        id(vcsName.toId())
+        name = vcsName
+        url = vcsUrl
+        branch = "refs/heads/$vcsBranch"
+        branchSpec = """
+            +:refs/heads/($vcsBranch)
+            +:refs/tags/(*)
+        """.trimIndent()
+        useTagsAsBranches = true
+        checkoutPolicy = GitVcsRoot.AgentCheckoutPolicy.NO_MIRRORS
+        configureAuthentication()
+    }
+    vcsRoot(vcsRoot)
+    return vcsRoot
+}
+
+fun GitVcsRoot.configureAuthentication() {
+    val vcsAuthMethod = DslContext.getParameter("vcs.auth.method", "anonymous")
+    when (vcsAuthMethod) {
+        "anonymous" -> {
+            authMethod = anonymous()
+        }
+
+        "uploadedkey" -> {
+            val vcsAuthUserName = DslContext.getParameter("vcs.auth.username", "")
+            val vcsAuthUploadedKey = DslContext.getParameter("vcs.auth.uploadedkey", "")
+            val vcsAuthPassphrase = DslContext.getParameter("vcs.auth.passphrase", "")
+            authMethod = uploadedKey {
+                if (vcsAuthUserName.isNotBlank()) userName = vcsAuthUserName
+                if (vcsAuthUploadedKey.isNotBlank()) uploadedKey = vcsAuthUploadedKey
+                if (vcsAuthPassphrase.isNotBlank()) passphrase = vcsAuthPassphrase
+            }
+        }
+
+        "password" -> {
+            val vcsAuthUserName = DslContext.getParameter("vcs.auth.username", "")
+            val vcsAuthPassword = DslContext.getParameter("vcs.auth.password", "")
+            authMethod = password {
+                if (vcsAuthUserName.isNotBlank()) userName = vcsAuthUserName
+                if (vcsAuthPassword.isNotBlank()) password = vcsAuthPassword
+            }
+        }
+
+        else -> throw IllegalArgumentException("Invalid authentication method: $vcsAuthMethod")
+    }
+}
 
 fun Project.defaultPluginBuildTemplate(vcsRoot: VcsRoot): Template {
     return template {

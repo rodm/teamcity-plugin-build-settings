@@ -1,41 +1,21 @@
 
 import extensions.defaultPluginBuildTemplate
+import extensions.createVcsRoot
 import jetbrains.buildServer.configs.kotlin.BuildType
 import jetbrains.buildServer.configs.kotlin.DslContext
 import jetbrains.buildServer.configs.kotlin.RelativeId
 import jetbrains.buildServer.configs.kotlin.Requirements
 import jetbrains.buildServer.configs.kotlin.project
-import jetbrains.buildServer.configs.kotlin.toId
-import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot
-import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot.AgentCheckoutPolicy.NO_MIRRORS
 import jetbrains.buildServer.configs.kotlin.version
 
 version = "2025.03"
 
 project {
-
-    val vcsName = DslContext.getParameter("vcs.name")
-    val vcsUrl = DslContext.getParameter("vcs.url")
-    val vcsBranch = DslContext.getParameter("vcs.branch", "master")
-    val vcsRoot = GitVcsRoot {
-        id(vcsName.toId())
-        name = vcsName
-        url = vcsUrl
-        branch = "refs/heads/$vcsBranch"
-        branchSpec = """
-            +:refs/heads/($vcsBranch)
-            +:refs/tags/(*)
-        """.trimIndent()
-        useTagsAsBranches = true
-        checkoutPolicy = NO_MIRRORS
-        configureAuthentication()
-    }
-    vcsRoot(vcsRoot)
-
     params {
         param("teamcity.ui.settings.readOnly", "true")
     }
 
+    val vcsRoot = createVcsRoot()
     val buildTemplate = defaultPluginBuildTemplate(vcsRoot)
 
     val apiVersions = DslContext.getParameter("teamcity.api.versions")
@@ -90,37 +70,6 @@ project {
     }
 
     buildTypesOrder = builds.toList()
-}
-
-fun GitVcsRoot.configureAuthentication() {
-    val vcsAuthMethod = DslContext.getParameter("vcs.auth.method", "anonymous")
-    when (vcsAuthMethod) {
-        "anonymous" -> {
-            authMethod = anonymous()
-        }
-
-        "uploadedkey" -> {
-            val vcsAuthUserName = DslContext.getParameter("vcs.auth.username", "")
-            val vcsAuthUploadedKey = DslContext.getParameter("vcs.auth.uploadedkey", "")
-            val vcsAuthPassphrase = DslContext.getParameter("vcs.auth.passphrase", "")
-            authMethod = uploadedKey {
-                if (vcsAuthUserName.isNotBlank()) userName = vcsAuthUserName
-                if (vcsAuthUploadedKey.isNotBlank()) uploadedKey = vcsAuthUploadedKey
-                if (vcsAuthPassphrase.isNotBlank()) passphrase = vcsAuthPassphrase
-            }
-        }
-
-        "password" -> {
-            val vcsAuthUserName = DslContext.getParameter("vcs.auth.username", "")
-            val vcsAuthPassword = DslContext.getParameter("vcs.auth.password", "")
-            authMethod = password {
-                if (vcsAuthUserName.isNotBlank()) userName = vcsAuthUserName
-                if (vcsAuthPassword.isNotBlank()) password = vcsAuthPassword
-            }
-        }
-
-        else -> throw IllegalArgumentException("Invalid authentication method: $vcsAuthMethod")
-    }
 }
 
 fun applyRequirement(name: String, build: BuildType) {
