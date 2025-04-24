@@ -1,7 +1,7 @@
 
 plugins {
     id ("org.jetbrains.kotlin.jvm") version "2.0.21"
-    id ("org.sonarqube") version "4.0.0.2929"
+    id ("org.sonarqube") version "6.1.0.5360"
     id ("io.github.rodm.teamcity-environments") version "1.5.5"
 }
 
