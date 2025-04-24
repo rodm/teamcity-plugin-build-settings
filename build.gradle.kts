@@ -1,9 +1,9 @@
 
 plugins {
-    id ("org.jetbrains.kotlin.jvm") version "2.0.21"
     id ("org.gradle.jacoco")
-    id ("org.sonarqube") version "6.1.0.5360"
-    id ("io.github.rodm.teamcity-environments") version "1.5.5"
+    alias (libs.plugins.kotlin.jvm)
+    alias (libs.plugins.sonarqube)
+    alias (libs.plugins.teamcity.environments)
 }
 
 group = "com.github.rodm"
@@ -18,12 +18,12 @@ repositories {
 }
 
 dependencies {
-    implementation ("org.jetbrains.teamcity:configs-dsl-kotlin-plugins-latest:1.0-SNAPSHOT")
+    implementation (libs.teamcity.configs.dsl.plugins)
 
-    testImplementation ("org.junit.jupiter:junit-jupiter:5.12.2")
-    testImplementation ("org.jetbrains.teamcity:server-api:2025.03")
+    testImplementation (libs.junit.jupiter)
+    testImplementation (libs.teamcity.server.api)
 
-    testRuntimeOnly ("org.junit.platform:junit-platform-launcher")
+    testRuntimeOnly (libs.junit.launcher)
 }
 
 sourceSets {
