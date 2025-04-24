@@ -2,6 +2,7 @@
 import extensions.defaultPluginBuildTemplate
 import extensions.createVcsRoot
 import extensions.createApiBuildConfigurations
+import extensions.createReportBuildConfiguration
 import jetbrains.buildServer.configs.kotlin.BuildType
 import jetbrains.buildServer.configs.kotlin.DslContext
 import jetbrains.buildServer.configs.kotlin.RelativeId
@@ -21,17 +22,7 @@ project {
 
     val builds = createApiBuildConfigurations(buildTemplate)
 
-    val gradleOptions = DslContext.getParameter("gradle.options", "")
-    val reportCodeQuality = buildType {
-        templates(buildTemplate)
-        id("ReportCodeQuality")
-        name = "Report - Code Quality"
-
-        params {
-            param("gradle.opts", "%sonar.opts% ${gradleOptions}")
-            param("gradle.tasks", "clean build sonar")
-        }
-    }
+    val reportCodeQuality = createReportBuildConfiguration(buildTemplate)
     builds.add(reportCodeQuality)
 
     val buildIds = builds.map { build -> build.id }
