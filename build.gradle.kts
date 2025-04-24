@@ -1,8 +1,12 @@
 
 plugins {
     id ("org.jetbrains.kotlin.jvm") version "2.0.21"
+    id ("org.sonarqube") version "4.0.0.2929"
     id ("io.github.rodm.teamcity-environments") version "1.5.5"
 }
+
+group = "com.github.rodm"
+version = "1.0-SNAPSHOT"
 
 repositories {
     maven {
