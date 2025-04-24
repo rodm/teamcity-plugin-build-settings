@@ -27,6 +27,7 @@ class VcsRootTest {
     @BeforeEach
     fun init() {
         DslContext.clearParameters()
+        DslContext.addParameters(Pair("dummy.parameter", "value"))
     }
 
     @Test
