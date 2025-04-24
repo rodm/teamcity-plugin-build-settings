@@ -1,6 +1,7 @@
 
 import extensions.defaultPluginBuildTemplate
 import extensions.createVcsRoot
+import extensions.createApiBuildConfigurations
 import jetbrains.buildServer.configs.kotlin.BuildType
 import jetbrains.buildServer.configs.kotlin.DslContext
 import jetbrains.buildServer.configs.kotlin.RelativeId
@@ -18,29 +19,9 @@ project {
     val vcsRoot = createVcsRoot()
     val buildTemplate = defaultPluginBuildTemplate(vcsRoot)
 
-    val apiVersions = DslContext.getParameter("teamcity.api.versions")
-    val gradleTasks = DslContext.getParameter("gradle.tasks", "")
+    val builds = createApiBuildConfigurations(buildTemplate)
+
     val gradleOptions = DslContext.getParameter("gradle.options", "")
-    val builds = mutableListOf<BuildType>()
-    apiVersions.split(",").forEachIndexed { index, version ->
-        val build = buildType {
-            templates(buildTemplate)
-            id("Build${index + 1}")
-            name = "Build - TeamCity ${version}"
-
-            if (index == 0) {
-                artifactRules = DslContext.getParameter("artifact.paths", "build/distributions/*.zip")
-            }
-            params {
-                param("gradle.opts", "-Pteamcity.api.version=${version} ${gradleOptions}")
-                if (gradleTasks.isNotEmpty()) {
-                    param("gradle.tasks", gradleTasks)
-                }
-            }
-        }
-        builds.add(build)
-    }
-
     val reportCodeQuality = buildType {
         templates(buildTemplate)
         id("ReportCodeQuality")
