@@ -40,6 +40,12 @@ java {
     }
 }
 
+sonarqube {
+    properties {
+        property ("sonar.kotlin.file.suffixes", "kt,kts")
+    }
+}
+
 teamcity {
     environments {
         register("teamcity2022.10") {
