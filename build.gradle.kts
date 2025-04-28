@@ -29,7 +29,7 @@ dependencies {
 sourceSets {
     main {
         kotlin {
-            srcDirs(".teamcity")
+            srcDirs("settings")
         }
     }
 }
