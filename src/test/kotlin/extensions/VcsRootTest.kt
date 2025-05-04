@@ -18,9 +18,15 @@ package extensions
 import jetbrains.buildServer.configs.kotlin.DslContext
 import jetbrains.buildServer.configs.kotlin.Project
 import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot.AgentCheckoutPolicy.NO_MIRRORS
+import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot.AuthMethod.Anonymous
+import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot.AuthMethod.Password
+import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot.AuthMethod.UploadedKey
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertInstanceOf
+import org.junit.jupiter.api.assertNull
+import org.junit.jupiter.api.assertThrows
 
 class VcsRootTest {
 
@@ -99,5 +105,85 @@ class VcsRootTest {
         val vcsRoot = Project().createVcsRoot()
 
         assertEquals(NO_MIRRORS, vcsRoot.checkoutPolicy)
+    }
+
+    @Test
+    fun `vcs root uses anonymous authentication by default`() {
+        val vcsRoot = Project().createVcsRoot()
+
+        assertInstanceOf<Anonymous>(vcsRoot.authMethod)
+    }
+
+    @Test
+    fun `vcs root uses anonymous authentication`() {
+        DslContext.addParameters(Pair("vcs.auth.method", "anonymous"))
+
+        val vcsRoot = Project().createVcsRoot()
+
+        assertInstanceOf<Anonymous>(vcsRoot.authMethod)
+    }
+
+    @Test
+    fun `vcs root uses uploaded key authentication without configuration`() {
+        DslContext.addParameters(Pair("vcs.auth.method", "uploadedkey"))
+
+        val vcsRoot = Project().createVcsRoot()
+
+        assertInstanceOf<UploadedKey>(vcsRoot.authMethod)
+        val authMethod = vcsRoot.authMethod as UploadedKey
+        assertNull(authMethod.userName)
+        assertNull(authMethod.uploadedKey)
+        assertNull(authMethod.passphrase)
+    }
+
+    @Test
+    fun `vcs root uses uploaded key authentication with configuration`() {
+        DslContext.addParameters(Pair("vcs.auth.method", "uploadedkey"))
+        DslContext.addParameters(Pair("vcs.auth.username", "username"))
+        DslContext.addParameters(Pair("vcs.auth.uploadedkey", "uploadedkey"))
+        DslContext.addParameters(Pair("vcs.auth.passphrase", "passphrase"))
+
+        val vcsRoot = Project().createVcsRoot()
+
+        assertInstanceOf<UploadedKey>(vcsRoot.authMethod)
+        val authMethod = vcsRoot.authMethod as UploadedKey
+        assertEquals("username", authMethod.userName)
+        assertEquals("uploadedkey", authMethod.uploadedKey)
+        assertEquals("passphrase", authMethod.passphrase)
+    }
+
+    @Test
+    fun `vcs root uses password authentication without configuration`() {
+        DslContext.addParameters(Pair("vcs.auth.method", "password"))
+
+        val vcsRoot = Project().createVcsRoot()
+
+        assertInstanceOf<Password>(vcsRoot.authMethod)
+        val authMethod = vcsRoot.authMethod as Password
+        assertNull(authMethod.userName)
+        assertNull(authMethod.password)
+    }
+
+    @Test
+    fun `vcs root uses password authentication with configuration`() {
+        DslContext.addParameters(Pair("vcs.auth.method", "password"))
+        DslContext.addParameters(Pair("vcs.auth.username", "username"))
+        DslContext.addParameters(Pair("vcs.auth.password", "password"))
+
+        val vcsRoot = Project().createVcsRoot()
+
+        assertInstanceOf<Password>(vcsRoot.authMethod)
+        val authMethod = vcsRoot.authMethod as Password
+        assertEquals("username", authMethod.userName)
+        assertEquals("password", authMethod.password)
+    }
+
+    @Test
+    fun `invalid authentication method throws exception`() {
+        DslContext.addParameters(Pair("vcs.auth.method", "invalid"))
+
+        val exception = assertThrows<IllegalArgumentException> { Project().createVcsRoot() }
+
+        assertEquals("Invalid authentication method: invalid", exception.message)
     }
 }
