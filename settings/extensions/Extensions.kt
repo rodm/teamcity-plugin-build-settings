@@ -50,7 +50,7 @@ fun Project.createVcsRoot(): GitVcsRoot {
 
 fun GitVcsRoot.configureAuthentication() {
     val vcsAuthMethod = DslContext.getParameter("vcs.auth.method", "anonymous")
-    when (vcsAuthMethod) {
+    when (vcsAuthMethod.trim()) {
         "anonymous" -> {
             authMethod = anonymous()
         }

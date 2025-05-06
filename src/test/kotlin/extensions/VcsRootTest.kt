@@ -27,6 +27,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertInstanceOf
 import org.junit.jupiter.api.assertNull
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 class VcsRootTest {
 
@@ -185,5 +187,15 @@ class VcsRootTest {
         val exception = assertThrows<IllegalArgumentException> { Project().createVcsRoot() }
 
         assertEquals("Invalid authentication method: invalid", exception.message)
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = [" anonymous", "anonymous ", " anonymous "])
+    fun `authentication method names have extra spaces removed`(method: String) {
+        DslContext.addParameters(Pair("vcs.auth.method", method))
+
+        val vcsRoot = Project().createVcsRoot()
+
+        assertInstanceOf<Anonymous>(vcsRoot.authMethod)
     }
 }
