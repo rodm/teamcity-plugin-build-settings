@@ -51,31 +51,34 @@ fun Project.createVcsRoot(): GitVcsRoot {
 fun GitVcsRoot.configureAuthentication() {
     val vcsAuthMethod = DslContext.getParameter("vcs.auth.method", "anonymous")
     when (vcsAuthMethod.trim()) {
-        "anonymous" -> {
-            authMethod = anonymous()
-        }
-
-        "uploadedkey" -> {
-            val vcsAuthUserName = DslContext.getParameter("vcs.auth.username", "")
-            val vcsAuthUploadedKey = DslContext.getParameter("vcs.auth.uploadedkey", "")
-            val vcsAuthPassphrase = DslContext.getParameter("vcs.auth.passphrase", "")
-            authMethod = uploadedKey {
-                if (vcsAuthUserName.isNotBlank()) userName = vcsAuthUserName
-                if (vcsAuthUploadedKey.isNotBlank()) uploadedKey = vcsAuthUploadedKey
-                if (vcsAuthPassphrase.isNotBlank()) passphrase = vcsAuthPassphrase
-            }
-        }
-
-        "password" -> {
-            val vcsAuthUserName = DslContext.getParameter("vcs.auth.username", "")
-            val vcsAuthPassword = DslContext.getParameter("vcs.auth.password", "")
-            authMethod = password {
-                if (vcsAuthUserName.isNotBlank()) userName = vcsAuthUserName
-                if (vcsAuthPassword.isNotBlank()) password = vcsAuthPassword
-            }
-        }
-
+        "anonymous" -> configureAnonymous()
+        "uploadedkey" -> configureUploadedKey()
+        "password" -> configurePassword()
         else -> throw IllegalArgumentException("Invalid authentication method: $vcsAuthMethod")
+    }
+}
+
+private fun GitVcsRoot.configureAnonymous() {
+    authMethod = anonymous()
+}
+
+private fun GitVcsRoot.configureUploadedKey() {
+    val vcsAuthUserName = DslContext.getParameter("vcs.auth.username", "")
+    val vcsAuthUploadedKey = DslContext.getParameter("vcs.auth.uploadedkey", "")
+    val vcsAuthPassphrase = DslContext.getParameter("vcs.auth.passphrase", "")
+    authMethod = uploadedKey {
+        if (vcsAuthUserName.isNotBlank()) userName = vcsAuthUserName
+        if (vcsAuthUploadedKey.isNotBlank()) uploadedKey = vcsAuthUploadedKey
+        if (vcsAuthPassphrase.isNotBlank()) passphrase = vcsAuthPassphrase
+    }
+}
+
+private fun GitVcsRoot.configurePassword() {
+    val vcsAuthUserName = DslContext.getParameter("vcs.auth.username", "")
+    val vcsAuthPassword = DslContext.getParameter("vcs.auth.password", "")
+    authMethod = password {
+        if (vcsAuthUserName.isNotBlank()) userName = vcsAuthUserName
+        if (vcsAuthPassword.isNotBlank()) password = vcsAuthPassword
     }
 }
 
@@ -189,7 +192,7 @@ fun configureRequirements(builds: MutableList<BuildType>) {
     }
 }
 
-fun applyRequirement(name: String, build: BuildType) {
+private fun applyRequirement(name: String, build: BuildType) {
     when (name) {
         "linux" -> build.requirements { linux() }
         "macos" -> build.requirements { macos() }
@@ -200,22 +203,22 @@ fun applyRequirement(name: String, build: BuildType) {
     }
 }
 
-fun Requirements.linux() {
+private fun Requirements.linux() {
     contains("teamcity.agent.jvm.os.name", "Linux")
 }
 
-fun Requirements.macos() {
+private fun Requirements.macos() {
     contains("teamcity.agent.jvm.os.name", "Mac OS X")
 }
 
-fun Requirements.solaris() {
+private fun Requirements.solaris() {
     contains("teamcity.agent.jvm.os.name", "SunOS")
 }
 
-fun Requirements.windows() {
+private fun Requirements.windows() {
     contains("teamcity.agent.jvm.os.name", "Windows")
 }
 
-fun Requirements.docker() {
+private fun Requirements.docker() {
     exists("docker.server.version")
 }
