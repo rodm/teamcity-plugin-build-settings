@@ -119,4 +119,25 @@ class BuildConfigurationsTest {
         assertEquals(1, build.templates.size)
         assertSame(template, build.templates[0])
     }
+
+    @Test
+    fun `only first build configuration has artifact rules`() {
+        DslContext.addParameters(Pair("teamcity.api.versions", "2018.1,2022.04,2025.03"))
+
+        val builds = Project().createApiBuildConfigurations(Template())
+
+        assertEquals("build/distributions/*.zip", builds[0].artifactRules)
+        assertEquals("", builds[1].artifactRules)
+        assertEquals("", builds[2].artifactRules)
+    }
+
+    @Test
+    fun `custom artifact rules`() {
+        DslContext.addParameters(Pair("artifact.paths", "subproject/build/distributions/*.zip"))
+        DslContext.addParameters(Pair("teamcity.api.versions", "2018.1"))
+
+        val builds = Project().createApiBuildConfigurations(Template())
+
+        assertEquals("subproject/build/distributions/*.zip", builds[0].artifactRules)
+    }
 }
