@@ -1,14 +1,13 @@
 
-import extensions.defaultPluginBuildTemplate
-import extensions.createVcsRoot
-import extensions.createApiBuildConfigurations
-import extensions.createReportBuildConfiguration
 import jetbrains.buildServer.configs.kotlin.BuildType
-import jetbrains.buildServer.configs.kotlin.DslContext
-import jetbrains.buildServer.configs.kotlin.RelativeId
-import jetbrains.buildServer.configs.kotlin.Requirements
 import jetbrains.buildServer.configs.kotlin.project
+import jetbrains.buildServer.configs.kotlin.toId
 import jetbrains.buildServer.configs.kotlin.version
+import jetbrains.buildServer.configs.kotlin.buildFeatures.perfmon
+import jetbrains.buildServer.configs.kotlin.buildSteps.gradle
+import jetbrains.buildServer.configs.kotlin.triggers.vcs
+import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot
+import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot.AgentCheckoutPolicy.NO_MIRRORS
 
 version = "2025.03"
 
@@ -17,60 +16,78 @@ project {
         param("teamcity.ui.settings.readOnly", "true")
     }
 
-    val vcsRoot = createVcsRoot()
-    val buildTemplate = defaultPluginBuildTemplate(vcsRoot)
+    val vcsRoot = GitVcsRoot {
+        id("teamcity-plugin-build".toId())
+        name = "teamcity-plugin-build"
+        url = "https://github.com/rodm/teamcity-plugin-build-settings.git"
+        branch = "refs/heads/main"
+        checkoutPolicy = NO_MIRRORS
+    }
+    vcsRoot(vcsRoot)
 
-    val builds = createApiBuildConfigurations(buildTemplate)
+    val template = template {
+        id("Build")
+        name = "Build"
 
-    val reportCodeQuality = createReportBuildConfiguration(buildTemplate)
-    builds.add(reportCodeQuality)
+        params {
+            param("gradle.opts", "")
+            param("gradle.tasks", "clean build")
+        }
 
-    val buildIds = builds.map { build -> build.id }
-    val requirements = DslContext.getParameter("agent.requirements", "")
-    if (requirements.isNotBlank()) {
-        requirements.split(",").forEach { requirement ->
-            val parts = requirement.split("=")
-            val name = parts.last().trim()
-            val buildId = if (parts.size > 1) parts.first().trim() else ""
+        vcs {
+            root(vcsRoot)
+        }
 
-            if (buildId.isNotEmpty().and(RelativeId(buildId) !in buildIds))
-                throw IllegalArgumentException("Invalid build id: $buildId")
+        steps {
+            gradle {
+                tasks = "%gradle.tasks%"
+                buildFile = ""
+                gradleParams = "%gradle.opts%"
+                enableStacktrace = true
+                jdkHome = "%java8.home%"
+            }
+        }
 
-            builds.filter { build -> buildId.isEmpty().or(RelativeId(buildId) == build.id) }
-                .forEach { build -> applyRequirement(name, build) }
+        triggers {
+            vcs {
+                triggerRules = """
+                -:.github/**
+                -:README.adoc
+                """.trimIndent()
+            }
+        }
+
+        features {
+            perfmon {
+                id = "perfmon"
+            }
         }
     }
 
-    buildTypesOrder = builds.toList()
-}
 
-fun applyRequirement(name: String, build: BuildType) {
-    when (name) {
-        "linux" -> build.requirements { linux() }
-        "macos" -> build.requirements { macos() }
-        "solaris" -> build.requirements { solaris() }
-        "windows" -> build.requirements { windows() }
-        "docker" -> build.requirements { docker() }
-        else -> throw IllegalArgumentException("Invalid requirement: $name")
+    val builds = mutableListOf<BuildType>()
+    val build = buildType {
+        id("Build1")
+        templates(template)
+        name = "Build - Settings"
+
+        params {
+            param("gradle.opts", "-Pteamcity.server.url=%teamcity.serverUrl%/app/dsl-plugins-repository")
+        }
     }
-}
+    builds.add(build)
 
-fun Requirements.linux() {
-    contains("teamcity.agent.jvm.os.name", "Linux")
-}
+    val report = buildType {
+        id("Report")
+        templates(template)
+        name = "Report - Code Quality"
 
-fun Requirements.macos() {
-    contains("teamcity.agent.jvm.os.name", "Mac OS X")
-}
+        params {
+            param("gradle.opts", "-Pteamcity.server.url=%teamcity.serverUrl%/app/dsl-plugins-repository %sonar.opts%")
+            param("gradle.tasks", "clean build sonar")
+        }
+    }
+    builds.add(report)
 
-fun Requirements.solaris() {
-    contains("teamcity.agent.jvm.os.name", "SunOS")
-}
-
-fun Requirements.windows() {
-    contains("teamcity.agent.jvm.os.name", "Windows")
-}
-
-fun Requirements.docker() {
-    exists("docker.server.version")
+    buildTypesOrder = builds.toList()
 }
