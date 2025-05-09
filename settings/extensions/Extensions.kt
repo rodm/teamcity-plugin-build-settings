@@ -27,6 +27,11 @@ import jetbrains.buildServer.configs.kotlin.toId
 import jetbrains.buildServer.configs.kotlin.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot
 
+private const val GRADLE_OPTS = "gradle.opts"
+private const val GRADLE_TASKS = "gradle.tasks"
+private const val JAVA_HOME = "java.home"
+private const val TEAMCITY_AGENT_JVM_OS_NAME = "teamcity.agent.jvm.os.name"
+
 fun Project.createVcsRoot(): GitVcsRoot {
     val vcsName = DslContext.getParameter("vcs.name")
     val vcsUrl = DslContext.getParameter("vcs.url")
@@ -125,9 +130,9 @@ fun Project.defaultPluginBuildTemplate(vcsRoot: VcsRoot): Template {
         }
 
         params {
-            param("gradle.opts", "")
-            param("gradle.tasks", "clean build")
-            param("java.home", "%java8.home%")
+            param(GRADLE_OPTS, "")
+            param(GRADLE_TASKS, "clean build")
+            param(JAVA_HOME, "%java8.home%")
         }
     }
 }
@@ -136,7 +141,7 @@ fun Project.createApiBuildConfigurations(buildTemplate: Template): MutableList<B
     val apiVersions = DslContext.getParameter("teamcity.api.versions")
     if (apiVersions.isBlank()) throw IllegalArgumentException("Empty API versions list")
 
-    val gradleTasks = DslContext.getParameter("gradle.tasks", "")
+    val gradleTasks = DslContext.getParameter(GRADLE_TASKS, "")
     val gradleOptions = DslContext.getParameter("gradle.options", "")
     val builds = mutableListOf<BuildType>()
     apiVersions.split(",").forEachIndexed { index, version ->
@@ -149,9 +154,9 @@ fun Project.createApiBuildConfigurations(buildTemplate: Template): MutableList<B
                 artifactRules = DslContext.getParameter("artifact.paths", "build/distributions/*.zip")
             }
             params {
-                param("gradle.opts","-Pteamcity.api.version=${version.trim()} ${gradleOptions}".trim())
+                param(GRADLE_OPTS,"-Pteamcity.api.version=${version.trim()} ${gradleOptions}".trim())
                 if (gradleTasks.isNotEmpty()) {
-                    param("gradle.tasks", gradleTasks)
+                    param(GRADLE_TASKS, gradleTasks)
                 }
             }
         }
@@ -168,8 +173,8 @@ fun Project.createReportBuildConfiguration(buildTemplate: Template): BuildType {
         name = "Report - Code Quality"
 
         params {
-            param("gradle.opts", "%sonar.opts% ${gradleOptions}".trim())
-            param("gradle.tasks", "clean build sonar")
+            param(GRADLE_OPTS, "%sonar.opts% ${gradleOptions}".trim())
+            param(GRADLE_TASKS, "clean build sonar")
         }
     }
 }
@@ -204,19 +209,19 @@ private fun applyRequirement(name: String, build: BuildType) {
 }
 
 private fun Requirements.linux() {
-    contains("teamcity.agent.jvm.os.name", "Linux")
+    contains(TEAMCITY_AGENT_JVM_OS_NAME, "Linux")
 }
 
 private fun Requirements.macos() {
-    contains("teamcity.agent.jvm.os.name", "Mac OS X")
+    contains(TEAMCITY_AGENT_JVM_OS_NAME, "Mac OS X")
 }
 
 private fun Requirements.solaris() {
-    contains("teamcity.agent.jvm.os.name", "SunOS")
+    contains(TEAMCITY_AGENT_JVM_OS_NAME, "SunOS")
 }
 
 private fun Requirements.windows() {
-    contains("teamcity.agent.jvm.os.name", "Windows")
+    contains(TEAMCITY_AGENT_JVM_OS_NAME, "Windows")
 }
 
 private fun Requirements.docker() {
