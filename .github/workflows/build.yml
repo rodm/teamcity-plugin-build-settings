@@ -22,7 +22,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Build and run tests
-        run: ./gradlew --show-version -s build
+        run: ./gradlew --show-version -s build -Pteamcity.server.url=https://teamcity.jetbrains.com/app/dsl-plugins-repository
       - name: Upload test reports
         uses: actions/upload-artifact@v4
         if: failure()
