@@ -40,8 +40,17 @@ class ReportConfigurationTest {
         assertEquals("Report - Code Quality", build.name)
         val parameters = build.params.params
         assertEquals(2, parameters.size)
-        assertEquals(Parameter("gradle.opts", "%sonar.opts%"), parameters[0])
+        assertEquals(Parameter("gradle.opts", "%report.opts%"), parameters[0])
         assertEquals(Parameter("gradle.tasks", "clean build sonar"), parameters[1])
+    }
+
+    @Test
+    fun `alternative report task configuration`() {
+        DslContext.addParameters(Pair("report.task", "checkstyle"))
+        val build = Project().createReportBuildConfiguration(Template())
+
+        val parameters = build.params.params
+        assertEquals(Parameter("gradle.tasks", "clean build checkstyle"), parameters[1])
     }
 
     @Test
@@ -51,7 +60,7 @@ class ReportConfigurationTest {
         val build = Project().createReportBuildConfiguration(Template())
 
         val parameters = build.params.params
-        assertEquals(Parameter("gradle.opts", "%sonar.opts% -Ptest=value"), parameters[0])
+        assertEquals(Parameter("gradle.opts", "%report.opts% -Ptest=value"), parameters[0])
     }
 
     @Test

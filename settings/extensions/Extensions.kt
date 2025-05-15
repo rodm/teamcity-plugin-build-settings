@@ -167,14 +167,15 @@ fun Project.createApiBuildConfigurations(buildTemplate: Template): MutableList<B
 
 fun Project.createReportBuildConfiguration(buildTemplate: Template): BuildType {
     val gradleOptions = DslContext.getParameter("gradle.options", "")
+    val reportTask = DslContext.getParameter("report.task", "sonar")
     return buildType {
         templates(buildTemplate)
         id("ReportCodeQuality")
         name = "Report - Code Quality"
 
         params {
-            param(GRADLE_OPTS, "%sonar.opts% ${gradleOptions}".trim())
-            param(GRADLE_TASKS, "clean build sonar")
+            param(GRADLE_OPTS, "%report.opts% ${gradleOptions}".trim())
+            param(GRADLE_TASKS, "clean build ${reportTask}")
         }
     }
 }
