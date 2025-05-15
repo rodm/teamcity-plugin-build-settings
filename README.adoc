@@ -2,11 +2,19 @@
 :uri-teamcity-plugin: https://plugins.jetbrains.com/docs/teamcity/
 :uri-gradle: https://gradle.org/[Gradle]
 :uri-blog-post: https://blog.jetbrains.com/teamcity/2020/09/creating-teamcity-project-templates-with-kotlin-dsl-context-parameters/
+:uri-apache-license: http://www.apache.org/licenses/LICENSE-2.0.html[Apache License, Version 2.0]
+:project-name: teamcity-plugin-build-settings
+:uri-github: https://github.com
+:uri-github-project: {uri-github}/rodm/{project-name}
+:uri-github-actions: {uri-github-project}/actions
+:uri-github-status: {uri-github-actions}/workflows/build.yml/badge.svg
 
 = TeamCity Plugin Build Settings
 
 This project contains TeamCity {uri-teamcity-settings}[Kotlin DSL settings] to build
 a {uri-teamcity-plugin}[TeamCity plugin] using {uri-gradle}.
+
+image:{uri-github-status}?branch=main["Build Status", link="{uri-github-actions}"]
 
 The settings for a project can be configured with the following context parameters
 
@@ -45,3 +53,7 @@ Invalid build ids and requirement names throw an exception causing the `teamcity
 
 This project based on the ideas from the following blog post
 {uri-blog-post}[Creating TeamCity project templates with Kotlin DSL context parameters]
+
+== License
+
+This plugin is available under the {uri-apache-license}.
