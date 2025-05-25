@@ -1,5 +1,6 @@
 :uri-teamcity-settings: https://www.jetbrains.com/help/teamcity/kotlin-dsl.html
 :uri-teamcity-plugin: https://plugins.jetbrains.com/docs/teamcity/
+:uri-teamcity-docs: https://www.jetbrains.com/help/teamcity/2025.03/
 :uri-gradle: https://gradle.org/[Gradle]
 :uri-blog-post: https://blog.jetbrains.com/teamcity/2020/09/creating-teamcity-project-templates-with-kotlin-dsl-context-parameters/
 :uri-apache-license: http://www.apache.org/licenses/LICENSE-2.0.html[Apache License, Version 2.0]
@@ -31,8 +32,8 @@ Optional context parameters
 
 * `vcs.branch` - A name for the branch to use. The default is `master`.
 * `vcs.auth.method` - A name for the authentication method to use to access the VCS root. The default is `anonymous`.
-* `artifact.paths` - A comma separated or newline separated list of paths to search for artifacts to publish.
-https://www.jetbrains.com/help/teamcity/2024.07/?Configuring+General+Settings#ConfiguringGeneralSettings-ArtifactPaths
+* `artifact.paths` - A comma separated or newline separated list of paths to search for artifacts to publish. {uri-teamcity-docs}configuring-general-settings.html#Artifact+Paths[Artifact Paths]
+
 * `gradle.tasks` - A string of alternative Gradle tasks to run for build configurations excluding the report
 configuration. The default is `clean build`.
 * `gradle.options` - A string of additional options to be passed to the Gradle command. The default is an empty string.
@@ -41,6 +42,9 @@ not specified then the requirement applies to all build configurations. The defa
 * `report.task` - A task name to be run be the code quality report build configuration. The default is `sonar`.
 
 A list of VCS authentication method names
+
+For more information on the methods and parameters see the TeamCity documentation for Git
+{uri-teamcity-docs}git.html#Authentication+Settings[Authentication Settings]
 
 * `anonymous` - The VCS root requires no authentication.
 * `password` - The VCS root requires a username and password to access. The context parameters `vcs.auth.username` and
