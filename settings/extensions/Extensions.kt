@@ -88,6 +88,7 @@ private fun GitVcsRoot.configurePassword() {
 }
 
 fun Project.defaultPluginBuildTemplate(vcsRoot: VcsRoot): Template {
+    val javaHome = DslContext.getParameter("java.home", "%java8.home%")
     return template {
         id("Build")
         name = "build plugin"
@@ -132,7 +133,7 @@ fun Project.defaultPluginBuildTemplate(vcsRoot: VcsRoot): Template {
         params {
             param(GRADLE_OPTS, "")
             param(GRADLE_TASKS, "clean build")
-            param(JAVA_HOME, "%java8.home%")
+            param(JAVA_HOME, javaHome)
         }
     }
 }

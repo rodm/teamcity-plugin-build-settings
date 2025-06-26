@@ -37,6 +37,7 @@ Optional context parameters
 * `gradle.tasks` - A string of alternative Gradle tasks to run for build configurations excluding the report
 configuration. The default is `clean build`.
 * `gradle.options` - A string of additional options to be passed to the Gradle command. The default is an empty string.
+* `java.home` - A path or configuration parameter that defines a path to a JDK installation. The default is `%java8.home`.
 * `agent.requirements` - A comma separated list of either build id and requirement or requirement. If the build id is
 not specified then the requirement applies to all build configurations. The default is no agent requirement, e.g. `Build1=linux,docker`, this example creates all build configurations requiring Docker and `Build1` to require Docker and Linux.
 * `report.task` - A task name to be run be the code quality report build configuration. The default is `sonar`.

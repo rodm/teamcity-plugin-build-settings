@@ -15,19 +15,29 @@
  */
 package extensions
 
+import jetbrains.buildServer.configs.kotlin.DslContext
 import jetbrains.buildServer.configs.kotlin.Parameter
 import jetbrains.buildServer.configs.kotlin.Project
+import jetbrains.buildServer.configs.kotlin.Template
 import jetbrains.buildServer.configs.kotlin.buildSteps.GradleBuildStep
 import jetbrains.buildServer.configs.kotlin.triggers.VcsTrigger
 import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertSame
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class DefaultBuildTemplateTest {
 
     private val vcsRoot = GitVcsRoot()
-    private var template = Project().defaultPluginBuildTemplate(vcsRoot)
+    private lateinit var template: Template
+
+    @BeforeEach
+    fun init() {
+        DslContext.clearParameters()
+        DslContext.addParameters(Pair("dummy.parameter", "value"))
+        template = Project().defaultPluginBuildTemplate(vcsRoot)
+    }
 
     @Test
     fun `template name`() {
@@ -79,5 +89,15 @@ class DefaultBuildTemplateTest {
         assertEquals(Parameter("gradle.opts", ""), parameters[0])
         assertEquals(Parameter("gradle.tasks", "clean build"), parameters[1])
         assertEquals(Parameter("java.home", "%java8.home%"), parameters[2])
+    }
+
+    @Test
+    fun `alternative java home`() {
+        DslContext.addParameters(Pair("java.home", "%java17.home%"))
+        template = Project().defaultPluginBuildTemplate(vcsRoot)
+
+        val parameters = template.params.params
+        assertEquals(3, parameters.size)
+        assertEquals(Parameter("java.home", "%java17.home%"), parameters[2])
     }
 }
