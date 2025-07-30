@@ -49,7 +49,7 @@ sonarqube {
 teamcity {
     environments {
         register("teamcity") {
-            version = "2025.03.2"
+            version = "2025.07"
         }
     }
 }
