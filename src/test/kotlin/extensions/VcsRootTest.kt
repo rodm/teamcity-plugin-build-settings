@@ -96,6 +96,38 @@ class VcsRootTest {
     }
 
     @Test
+    fun `branch specification with additional branches`() {
+        val branches = "branch-1,branch-2"
+        DslContext.addParameters(Pair("vcs.branches", branches))
+
+        val vcsRoot = Project().createVcsRoot()
+
+        val expectedBranchSpec = """
+            +:refs/heads/(master)
+            +:refs/heads/(branch-1)
+            +:refs/heads/(branch-2)
+            +:refs/tags/(*)
+        """.trimIndent()
+        assertEquals(expectedBranchSpec, vcsRoot.branchSpec)
+    }
+
+    @Test
+    fun `strip spaces and blank additional branches `() {
+        val branches = "branch-1 , , branch-2,"
+        DslContext.addParameters(Pair("vcs.branches", branches))
+
+        val vcsRoot = Project().createVcsRoot()
+
+        val expectedBranchSpec = """
+            +:refs/heads/(master)
+            +:refs/heads/(branch-1)
+            +:refs/heads/(branch-2)
+            +:refs/tags/(*)
+        """.trimIndent()
+        assertEquals(expectedBranchSpec, vcsRoot.branchSpec)
+    }
+
+    @Test
     fun `use tags as branches enabled`() {
         val vcsRoot = Project().createVcsRoot()
 

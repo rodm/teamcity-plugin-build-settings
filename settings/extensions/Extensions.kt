@@ -36,15 +36,18 @@ fun Project.createVcsRoot(): GitVcsRoot {
     val vcsName = DslContext.getParameter("vcs.name")
     val vcsUrl = DslContext.getParameter("vcs.url")
     val vcsBranch = DslContext.getParameter("vcs.branch", "master")
+    val vcsBranches = DslContext.getParameter("vcs.branches", "")
     val vcsRoot = GitVcsRoot {
         id(vcsName.toId())
         name = vcsName
         url = vcsUrl
         branch = "refs/heads/$vcsBranch"
-        branchSpec = """
-            +:refs/heads/($vcsBranch)
-            +:refs/tags/(*)
-        """.trimIndent()
+        branchSpec = "+:refs/heads/(${vcsBranch})\n" +
+            vcsBranches.splitToSequence(",")
+                .filter { branch -> branch.isNotBlank() }
+                .map { branch -> "+:refs/heads/(${branch.trim()})\n" }
+                .joinToString("") +
+            "+:refs/tags/(*)"
         useTagsAsBranches = true
         checkoutPolicy = GitVcsRoot.AgentCheckoutPolicy.NO_MIRRORS
         configureAuthentication()
