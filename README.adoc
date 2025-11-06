@@ -31,6 +31,8 @@ created to build the plugin code using that version of the TeamCity API.
 Optional context parameters
 
 * `vcs.branch` - A name for the branch to use. The default is `master`.
+* `vcs.branches` - A comma separated list of additional branches to monitor and build. The default is to monitor
+`vcs.branch` and tags.
 * `vcs.auth.method` - A name for the authentication method to use to access the VCS root. The default is `anonymous`.
 * `artifact.paths` - A comma separated or newline separated list of paths to search for artifacts to publish. {uri-teamcity-docs}configuring-general-settings.html#Artifact+Paths[Artifact Paths]
 
