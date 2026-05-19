@@ -88,7 +88,7 @@ class DefaultBuildTemplateTest {
         assertEquals(3, parameters.size)
         assertEquals(Parameter("gradle.opts", ""), parameters[0])
         assertEquals(Parameter("gradle.tasks", "clean build"), parameters[1])
-        assertEquals(Parameter("java.home", "%java8.home%"), parameters[2])
+        assertEquals(Parameter("java.home", "%java21.home%"), parameters[2])
     }
 
     @Test

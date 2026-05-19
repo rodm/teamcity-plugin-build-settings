@@ -44,7 +44,7 @@ project {
                 buildFile = ""
                 gradleParams = "%gradle.opts%"
                 enableStacktrace = true
-                jdkHome = "%java8.home%"
+                jdkHome = "%java21.home%"
             }
         }
 

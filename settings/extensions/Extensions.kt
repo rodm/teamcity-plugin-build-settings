@@ -91,7 +91,7 @@ private fun GitVcsRoot.configurePassword() {
 }
 
 fun Project.defaultPluginBuildTemplate(vcsRoot: VcsRoot): Template {
-    val javaHome = DslContext.getParameter("java.home", "%java8.home%")
+    val javaHome = DslContext.getParameter("java.home", "%java21.home%")
     return template {
         id("Build")
         name = "build plugin"
