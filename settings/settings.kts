@@ -7,7 +7,7 @@ import extensions.configureRequirements
 import jetbrains.buildServer.configs.kotlin.project
 import jetbrains.buildServer.configs.kotlin.version
 
-version = "2025.11"
+version = "2026.1"
 
 project {
     params {
