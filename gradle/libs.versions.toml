@@ -6,6 +6,6 @@ sonarqube = { id = "org.sonarqube", version = "7.5.0.8588" }
 
 [libraries]
 teamcity-configs-dsl-plugins = { module = "org.jetbrains.teamcity:configs-dsl-kotlin-plugins-latest", version = "1.0-SNAPSHOT" }
-teamcity-server-api = { module = "org.jetbrains.teamcity:server-api", version = "2026.1" }
-junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version = "6.0.3" }
+teamcity-server-api = { module = "org.jetbrains.teamcity:server-api", version = "2026.2" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version = "6.1.3" }
 junit-launcher = { module = "org.junit.platform:junit-platform-launcher" }
